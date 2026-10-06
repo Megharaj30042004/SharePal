@@ -55,16 +55,16 @@ const Navbar = ({ onSearchChange, searchTerm, products = [], startDate, endDate,
       
       {/* Top Main Header (Deep Purple #3F0E40) */}
       <div className="bg-[#3F0E40] text-white px-4 sm:px-6 lg:px-8 py-2.5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
           
           {/* SharePal Brand Logo */}
-          <a href="#" className="flex items-center gap-2">
-            <div className="bg-[#0052CC] text-white px-3 py-1.5 rounded-xl font-black italic text-lg tracking-wider flex items-center gap-1 shadow-md">
+          <a href="#" className="flex items-center gap-2 shrink-0">
+            <div className="bg-[#0052CC] text-white px-3 py-1.5 rounded-xl font-black italic text-base sm:text-lg tracking-wider flex items-center gap-1 shadow-md">
               <span>Share</span><span className="text-teal-300">Pal</span>
             </div>
           </a>
 
-          {/* Center Integrated Date & Location Bar Pill */}
+          {/* Desktop Center Integrated Date & Location Bar Pill */}
           <div className="hidden md:flex items-center bg-white text-slate-800 rounded-full px-4 py-1.5 text-xs font-bold shadow-md border border-slate-200 gap-3">
             
             {/* City Dropdown */}
@@ -110,13 +110,13 @@ const Navbar = ({ onSearchChange, searchTerm, products = [], startDate, endDate,
             {/* Delivery Date */}
             <div className="flex items-center gap-1.5 border-r border-slate-200 pr-3 text-slate-600">
               <Calendar className="w-3.5 h-3.5 text-slate-400" />
-              <span>Delivery Date: <strong className="text-slate-900">{formatDateDisplay(startDate)}</strong></span>
+              <span>Delivery: <strong className="text-slate-900">{formatDateDisplay(startDate)}</strong></span>
             </div>
 
             {/* Pickup Date */}
             <div className="flex items-center gap-1.5 text-slate-600">
               <Calendar className="w-3.5 h-3.5 text-slate-400" />
-              <span>Pickup Date: <strong className="text-slate-900">{formatDateDisplay(endDate)}</strong></span>
+              <span>Pickup: <strong className="text-slate-900">{formatDateDisplay(endDate)}</strong></span>
             </div>
 
             {/* Edit Button */}
@@ -128,6 +128,18 @@ const Navbar = ({ onSearchChange, searchTerm, products = [], startDate, endDate,
               <span>Edit</span>
             </button>
           </div>
+
+          {/* Mobile Center Date/City Pill (< md) */}
+          <button
+            onClick={onOpenDateModal}
+            className="flex md:hidden items-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/20 px-2.5 py-1 rounded-full text-[11px] font-semibold text-white cursor-pointer transition-colors"
+          >
+            <MapPin className="w-3 h-3 text-teal-300 shrink-0" />
+            <span className="truncate max-w-[70px]">{selectedCity}</span>
+            <span className="opacity-40">•</span>
+            <span className="text-teal-200 font-bold">{formatDateDisplay(startDate)}</span>
+            <Edit3 className="w-3 h-3 ml-0.5 text-white/80" />
+          </button>
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-4">
@@ -208,12 +220,12 @@ const Navbar = ({ onSearchChange, searchTerm, products = [], startDate, endDate,
       {/* Sub Header Category Tabs (White Bar) */}
       <div className="bg-white border-b border-slate-200 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center gap-8 sm:gap-16 h-11 text-xs font-bold text-slate-600">
+          <div className="flex items-center justify-start sm:justify-center gap-6 sm:gap-16 h-11 text-xs font-bold text-slate-600 overflow-x-auto no-scrollbar whitespace-nowrap">
             {mainCategories.map((cat) => (
               <a
                 key={cat.name}
                 href="#"
-                className={`relative py-3 hover:text-purple-900 transition-colors ${
+                className={`relative py-3 hover:text-purple-900 transition-colors shrink-0 ${
                   cat.active ? 'text-slate-900 font-extrabold' : ''
                 }`}
               >

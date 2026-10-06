@@ -3,12 +3,12 @@ import { Gamepad2, Sparkles } from 'lucide-react';
 
 const HeroBannerCard = () => {
   return (
-    <div className="w-full bg-gradient-to-r from-[#5E17EB] via-[#4800C6] to-[#3B00B9] text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden border border-purple-400/30 mb-8">
+    <div className="w-full bg-gradient-to-r from-[#5E17EB] via-[#4800C6] to-[#3B00B9] text-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 lg:p-10 shadow-2xl relative overflow-hidden border border-purple-400/30 mb-6 sm:mb-8">
       
       {/* Background Decorative Glow */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
       
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 relative z-10">
         
         {/* Left Console Showcase Image */}
         <div className="hidden lg:flex items-center gap-3 shrink-0">
@@ -20,13 +20,13 @@ const HeroBannerCard = () => {
         </div>
 
         {/* Center Content Text */}
-        <div className="text-center flex-1 max-w-xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-teal-300 text-xs font-black uppercase tracking-widest border border-white/20">
+        <div className="text-center flex-1 max-w-xl mx-auto space-y-2.5 sm:space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-teal-300 text-[10px] sm:text-xs font-black uppercase tracking-widest border border-white/20">
             <Sparkles className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
             <span>Official SharePal Catalog</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white drop-shadow-md">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white drop-shadow-md">
             Gaming Consoles
           </h1>
 
@@ -35,15 +35,15 @@ const HeroBannerCard = () => {
           </p>
 
           {/* Brand Partner Badges */}
-          <div className="pt-3 flex items-center justify-center gap-6 text-xs font-black tracking-widest text-white/90 uppercase border-t border-white/15">
-            <span className="flex items-center gap-1 bg-white/10 px-3 py-1 rounded-lg border border-white/20">
+          <div className="pt-3 flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-[11px] sm:text-xs font-black tracking-wider text-white/90 uppercase border-t border-white/15">
+            <span className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-lg border border-white/20">
               <span className="text-emerald-400 text-sm font-black">🎮</span> XBOX
             </span>
-            <span className="flex items-center gap-1 bg-white/10 px-3 py-1 rounded-lg border border-white/20">
+            <span className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-lg border border-white/20">
               <span className="text-blue-400 text-sm font-black">⚡</span> PS5
             </span>
-            <span className="flex items-center gap-1 bg-white/10 px-3 py-1 rounded-lg border border-white/20">
-              <span className="text-cyan-300 text-sm font-black">🥽</span> Meta
+            <span className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-lg border border-white/20">
+              <span className="text-cyan-300 text-sm font-black">🥽</span> Meta VR
             </span>
           </div>
         </div>
