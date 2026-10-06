@@ -51,49 +51,47 @@ const ProductCard = ({ product, onSelectDates }) => {
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
       transition={{ duration: 0.25 }}
-      className="bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-xl hover:border-teal-300 transition-all duration-300 flex flex-col overflow-hidden group"
+      className="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-xl hover:border-purple-300 transition-all duration-300 flex flex-col overflow-hidden group"
     >
       {/* Top Image Container */}
-      <div className="relative bg-slate-50 p-4 h-56 flex items-center justify-center overflow-hidden border-b border-slate-100">
+      <div className="relative bg-white p-6 h-64 flex items-center justify-center overflow-hidden border-b border-slate-100">
         
-        {/* Badges Overlay */}
-        <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5 items-start">
-          {product.tag && (
-            <span className="bg-slate-900 text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow-xs tracking-wider flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-teal-400" />
-              {product.tag}
-            </span>
-          )}
-          {product.isZeroDeposit && (
-            <span className="bg-emerald-600 text-white text-[10px] font-black uppercase px-2.5 py-0.5 rounded-md shadow-xs flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3" />
-              Zero Deposit
-            </span>
-          )}
+        {/* SharePal Screenshot Exact "Trending" Badge */}
+        <div className="absolute top-4 left-4 z-10">
+          <span className="bg-white text-[#FF6B00] border border-[#FF6B00] text-[11px] font-extrabold px-3 py-1 rounded-full shadow-2xs tracking-wide">
+            Trending
+          </span>
         </div>
 
         {/* Rating Badge */}
-        <div className="absolute top-3 right-3 z-10 bg-white/90 backdrop-blur-xs border border-slate-200 px-2 py-1 rounded-lg shadow-xs flex items-center gap-1 text-xs font-bold text-slate-800">
+        <div className="absolute top-4 right-4 z-10 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-full shadow-2xs flex items-center gap-1 text-xs font-bold text-slate-800">
           <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
           <span>{product.rating}</span>
           <span className="text-[10px] text-slate-400 font-normal">({product.reviewsCount})</span>
         </div>
 
-        {/* Main Product Image */}
+        {/* Product Image */}
         <img
           src={product.images[activeImageIdx] || product.images[0]}
           alt={product.title}
-          className="max-h-48 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+          className="max-h-52 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
         />
+
+        {/* Overlay Graphic Badge (100+ Free Games) */}
+        {product.category === 'ps5' && (
+          <div className="absolute bottom-4 left-4 z-10 bg-blue-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1 border border-blue-400">
+            <span>🎮 100+ FREE GAMES</span>
+          </div>
+        )}
 
         {/* Multi Image dots preview */}
         {product.images.length > 1 && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 z-10">
+          <div className="absolute bottom-3 right-4 flex items-center gap-1 z-10">
             {product.images.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setActiveImageIdx(idx)}
-                className={`w-2 h-2 rounded-full transition-all ${activeImageIdx === idx ? 'bg-teal-600 w-4' : 'bg-slate-300'}`}
+                className={`w-2 h-2 rounded-full transition-all ${activeImageIdx === idx ? 'bg-[#5E17EB] w-4' : 'bg-slate-300'}`}
               />
             ))}
           </div>
@@ -103,10 +101,10 @@ const ProductCard = ({ product, onSelectDates }) => {
       {/* Product Content Body */}
       <div className="p-5 flex-1 flex flex-col justify-between">
         <div>
-          <div className="text-[11px] font-bold text-teal-600 uppercase tracking-wider mb-1">
+          <div className="text-[11px] font-bold text-purple-700 uppercase tracking-wider mb-1">
             {product.categoryLabel}
           </div>
-          <h3 className="text-base font-extrabold text-slate-900 leading-snug line-clamp-2 group-hover:text-teal-600 transition-colors">
+          <h3 className="text-base font-extrabold text-slate-900 leading-snug line-clamp-2 group-hover:text-[#5E17EB] transition-colors">
             {product.title}
           </h3>
 
@@ -132,7 +130,7 @@ const ProductCard = ({ product, onSelectDates }) => {
                 onClick={() => setSelectedTenure(t.id)}
                 className={`flex-1 py-1 px-1 text-[10.5px] font-bold rounded-lg transition-all text-center whitespace-nowrap cursor-pointer ${
                   selectedTenure === t.id
-                    ? 'bg-white text-teal-700 shadow-xs border border-teal-200 font-extrabold'
+                    ? 'bg-white text-[#5E17EB] shadow-2xs border border-purple-200 font-extrabold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -142,18 +140,18 @@ const ProductCard = ({ product, onSelectDates }) => {
           </div>
 
           {/* Pricing Display Box (Explicit Total & Per-Day Rate) */}
-          <div className="flex flex-col gap-1 mb-4 bg-slate-50/80 p-3 rounded-xl border border-slate-100">
+          <div className="flex flex-col gap-1 mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
             <div className="flex items-baseline justify-between">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Rental Fee</span>
                 <span className="text-2xl font-black text-slate-900 tracking-tight">₹{price.toLocaleString('en-IN')}</span>
               </div>
-              <div className="text-[11px] font-extrabold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded border border-emerald-200">
+              <div className="text-[11px] font-extrabold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-lg border border-emerald-200">
                 ~₹{perDayRate}/day
               </div>
             </div>
             <div className="text-[10.5px] text-slate-500 font-medium">
-              Total for <strong className="text-slate-800">{getTenureText(selectedTenure)}</strong>
+              Total for <strong className="text-slate-800">{getTenureText(selectedTenure)}</strong> • <span className="text-emerald-600 font-bold">Zero Deposit</span>
             </div>
           </div>
 
@@ -163,10 +161,10 @@ const ProductCard = ({ product, onSelectDates }) => {
             {/* Custom Calendar Dates Button */}
             <button
               onClick={() => onSelectDates(product, selectedTenure)}
-              className="col-span-2 flex items-center justify-center gap-1.5 px-3 py-2.5 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 border border-slate-200 hover:border-teal-200 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
+              className="col-span-2 flex items-center justify-center gap-1.5 px-3 py-2.5 bg-slate-100 hover:bg-purple-50 text-slate-700 hover:text-purple-900 border border-slate-200 hover:border-purple-200 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
               title="Select Exact Rental Dates"
             >
-              <Calendar className="w-3.5 h-3.5 text-teal-600" />
+              <Calendar className="w-3.5 h-3.5 text-[#5E17EB]" />
               <span>Dates</span>
             </button>
 
@@ -176,7 +174,7 @@ const ProductCard = ({ product, onSelectDates }) => {
               className={`col-span-3 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-extrabold text-white shadow-md transition-all active:scale-95 cursor-pointer ${
                 isAdded 
                   ? 'bg-emerald-600 shadow-emerald-500/20' 
-                  : 'bg-teal-600 hover:bg-teal-700 shadow-teal-500/20'
+                  : 'bg-[#5E17EB] hover:bg-purple-800 shadow-purple-500/20'
               }`}
             >
               {isAdded ? (
