@@ -3,7 +3,7 @@
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    color: #1E293B;
+    color: #0F172A;
     background-color: #F8FAFC;
     overflow-x: hidden;
   }
@@ -11,35 +11,40 @@
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: #F1F5F9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 4px;
+  background: #cbd5e1;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #94a3b8;
 }
 
-/* Custom SharePal Shadows & Animations */
-.sharepal-shadow {
-  box-shadow: 0 10px 30px -5px rgba(14, 165, 233, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+/* SharePal Universal Premium Shadows & Elevations */
+.sharepal-card-shadow {
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
 }
 
-.sharepal-shadow-hover:hover {
-  box-shadow: 0 20px 35px -5px rgba(14, 165, 233, 0.15), 0 10px 15px -5px rgba(0, 0, 0, 0.06);
+.sharepal-card-shadow:hover {
+  box-shadow: 0 20px 35px -5px rgba(14, 165, 233, 0.12), 0 8px 16px -4px rgba(15, 23, 42, 0.06);
 }
 
-/* Badge Pulse */
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(1.03); }
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
-.animate-pulse-subtle {
-  animation: pulse-subtle 2.5s infinite ease-in-out;
+/* Hide scrollbar for clean tab navigation */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

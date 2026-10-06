@@ -13,7 +13,9 @@ import {
   CheckCircle2,
   MapPin,
   User,
-  Phone
+  Phone,
+  Mail,
+  AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -40,7 +42,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
   const [isCheckoutStep, setIsCheckoutStep] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // User delivery info state
+  // Customer delivery details state
   const [userInfo, setUserInfo] = useState({
     name: '',
     email: '',
@@ -48,9 +50,63 @@ const CartDrawer = ({ onOrderSuccess }) => {
     address: '',
     pincode: '560001'
   });
-  const [formError, setFormError] = useState('');
+  const [formErrors, setFormErrors] = useState({});
 
   if (!isCartDrawerOpen) return null;
+
+  // Strict Phone input handler (allows only digits up to 10 characters)
+  const handlePhoneChange = (e) => {
+    const rawVal = e.target.value.replace(/\D/g, ''); // strip non-digits
+    const cleanPhone = rawVal.slice(0, 10); // cap at 10 digits
+    setUserInfo(prev => ({ ...prev, phone: cleanPhone }));
+
+    if (formErrors.phone) {
+      setFormErrors(prev => ({ ...prev, phone: '' }));
+    }
+  };
+
+  // Strict Pincode input handler
+  const handlePincodeChange = (e) => {
+    const cleanPin = e.target.value.replace(/\D/g, '').slice(0, 6);
+    setUserInfo(prev => ({ ...prev, pincode: cleanPin }));
+  };
+
+  // Validation function
+  const validateForm = () => {
+    const errors = {};
+
+    // 1. Name validation
+    if (!userInfo.name.trim() || userInfo.name.trim().length < 2) {
+      errors.name = 'Please enter your full name.';
+    }
+
+    // 2. Strict 10-digit Phone validation (Indian mobile format starting with 6,7,8,9)
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!userInfo.phone) {
+      errors.phone = 'Mobile number is required.';
+    } else if (!phoneRegex.test(userInfo.phone)) {
+      errors.phone = 'Please enter a valid 10-digit mobile number (e.g. 9876543210).';
+    }
+
+    // 3. Strict Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (userInfo.email.trim() && !emailRegex.test(userInfo.email.trim())) {
+      errors.email = 'Please enter a valid email address (e.g. name@example.com).';
+    }
+
+    // 4. Address validation
+    if (!userInfo.address.trim() || userInfo.address.trim().length < 5) {
+      errors.address = 'Please enter complete delivery street address (at least 5 characters).';
+    }
+
+    // 5. Pincode validation
+    if (userInfo.pincode && userInfo.pincode.length !== 6) {
+      errors.pincode = 'Pincode must be exactly 6 digits.';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleApplyCoupon = (e) => {
     e.preventDefault();
@@ -61,12 +117,11 @@ const CartDrawer = ({ onOrderSuccess }) => {
 
   const handleCheckout = async (e) => {
     e.preventDefault();
-    if (!userInfo.name || !userInfo.phone || !userInfo.address) {
-      setFormError('Please enter your Name, Phone Number, and Delivery Address.');
+    
+    if (!validateForm()) {
       return;
     }
 
-    setFormError('');
     setIsSubmitting(true);
 
     try {
@@ -120,10 +175,10 @@ const CartDrawer = ({ onOrderSuccess }) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={() => setIsCartDrawerOpen(false)}
-          className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+          className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity"
         />
 
-        <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+        <div className="fixed inset-y-0 right-0 max-w-full flex pl-4 sm:pl-10">
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
@@ -133,15 +188,15 @@ const CartDrawer = ({ onOrderSuccess }) => {
           >
             
             {/* Header */}
-            <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="bg-slate-900 text-white p-4 sm:p-5 flex items-center justify-between border-b border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-teal-600 rounded-xl">
-                  <ShoppingBag className="w-5 h-5 text-white" />
+                <div className="p-2.5 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl text-slate-950 shadow-md">
+                  <ShoppingBag className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-extrabold">Your Rental Bag</h2>
+                  <h2 className="text-base font-extrabold text-white">Your Rental Bag</h2>
                   <p className="text-xs text-slate-300">
-                    {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'} selected for {selectedCity}
+                    {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'} for <span className="text-teal-400 font-bold">{selectedCity}</span>
                   </p>
                 </div>
               </div>
@@ -154,11 +209,11 @@ const CartDrawer = ({ onOrderSuccess }) => {
             </div>
 
             {/* Cart Body */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-6">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5">
               
               {cartItems.length === 0 ? (
                 <div className="py-20 text-center">
-                  <div className="inline-flex p-4 bg-slate-100 text-slate-400 rounded-full mb-3">
+                  <div className="inline-flex p-4 bg-teal-50 text-teal-600 rounded-full mb-3">
                     <ShoppingBag className="w-10 h-10" />
                   </div>
                   <h3 className="text-base font-bold text-slate-800">Your Rental Bag is Empty</h3>
@@ -167,7 +222,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
                   </p>
                   <button
                     onClick={() => setIsCartDrawerOpen(false)}
-                    className="mt-5 px-5 py-2.5 bg-teal-600 text-white rounded-full text-xs font-bold shadow-md hover:bg-teal-700 transition-all cursor-pointer"
+                    className="mt-5 px-5 py-2.5 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white rounded-full text-xs font-bold shadow-md transition-all cursor-pointer"
                   >
                     Explore Gaming Gadgets
                   </button>
@@ -175,9 +230,9 @@ const CartDrawer = ({ onOrderSuccess }) => {
               ) : !isCheckoutStep ? (
                 /* Step 1: Items List & Coupons */
                 <>
-                  <div className="space-y-4">
+                  <div className="space-y-3.5">
                     {cartItems.map((item, idx) => (
-                      <div key={idx} className="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 flex gap-3 relative">
+                      <div key={idx} className="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-3.5 flex gap-3 relative hover:border-teal-300 transition-all">
                         <img
                           src={item.image}
                           alt={item.title}
@@ -188,7 +243,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
                             <h4 className="text-xs font-extrabold text-slate-900 truncate pr-6">{item.title}</h4>
                             <button
                               onClick={() => removeFromCart(idx)}
-                              className="text-slate-400 hover:text-red-500 absolute top-4 right-4 cursor-pointer"
+                              className="text-slate-400 hover:text-red-500 absolute top-3.5 right-3.5 cursor-pointer"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -240,7 +295,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
                   </div>
 
                   {/* Coupon Code Section */}
-                  <div className="bg-gradient-to-br from-teal-50/50 to-cyan-50/50 border border-teal-100 p-4 rounded-2xl">
+                  <div className="bg-gradient-to-br from-teal-50/70 to-cyan-50/70 border border-teal-200/80 p-4 rounded-2xl">
                     <div className="flex items-center gap-2 text-xs font-bold text-slate-800 mb-2">
                       <Tag className="w-4 h-4 text-teal-600" />
                       <span>Have a Discount Coupon?</span>
@@ -292,14 +347,14 @@ const CartDrawer = ({ onOrderSuccess }) => {
                         <button
                           type="button"
                           onClick={() => { setCouponInput('EARLYBIRD15'); applyCoupon('EARLYBIRD15'); }}
-                          className="text-[10px] font-bold bg-white text-teal-700 border border-teal-200 px-2 py-1 rounded-lg shrink-0 cursor-pointer"
+                          className="text-[10px] font-bold bg-white text-teal-700 border border-teal-200 px-2 py-1 rounded-lg shrink-0 cursor-pointer hover:bg-teal-50"
                         >
                           🏷️ EARLYBIRD15 (15% OFF)
                         </button>
                         <button
                           type="button"
                           onClick={() => { setCouponInput('SHAREPAL'); applyCoupon('SHAREPAL'); }}
-                          className="text-[10px] font-bold bg-white text-teal-700 border border-teal-200 px-2 py-1 rounded-lg shrink-0 cursor-pointer"
+                          className="text-[10px] font-bold bg-white text-teal-700 border border-teal-200 px-2 py-1 rounded-lg shrink-0 cursor-pointer hover:bg-teal-50"
                         >
                           🏷️ SHAREPAL (₹300 OFF)
                         </button>
@@ -308,11 +363,11 @@ const CartDrawer = ({ onOrderSuccess }) => {
                   </div>
                 </>
               ) : (
-                /* Step 2: Customer Delivery Details Form */
+                /* Step 2: Customer Delivery Details Form with Strict Validations */
                 <div className="space-y-4">
                   <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-600">
-                      Delivery Information ({selectedCity})
+                    <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">
+                      Delivery Details ({selectedCity})
                     </h3>
                     <button
                       onClick={() => setIsCheckoutStep(false)}
@@ -322,77 +377,146 @@ const CartDrawer = ({ onOrderSuccess }) => {
                     </button>
                   </div>
 
-                  {formError && (
-                    <div className="bg-red-50 border border-red-200 text-red-600 text-xs p-3 rounded-xl">
-                      {formError}
-                    </div>
-                  )}
-
-                  <div className="space-y-3 text-xs">
+                  <div className="space-y-3.5 text-xs">
+                    
+                    {/* Full Name */}
                     <div>
-                      <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
-                        <User className="w-3.5 h-3.5 text-teal-600" /> Full Name *
+                      <label className="font-bold text-slate-700 block mb-1 flex items-center justify-between">
+                        <span className="flex items-center gap-1">
+                          <User className="w-3.5 h-3.5 text-teal-600" /> Full Name *
+                        </span>
+                        {userInfo.name.length >= 2 && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />}
                       </label>
                       <input
                         type="text"
                         required
                         value={userInfo.name}
-                        onChange={(e) => setUserInfo({ ...userInfo, name: e.target.value })}
+                        onChange={(e) => {
+                          setUserInfo({ ...userInfo, name: e.target.value });
+                          if (formErrors.name) setFormErrors({ ...formErrors, name: '' });
+                        }}
                         placeholder="e.g. Rahul Sharma"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-teal-500"
+                        className={`w-full bg-slate-50 border rounded-xl px-3 py-2.5 font-semibold focus:bg-white focus:outline-none ${
+                          formErrors.name ? 'border-red-500 ring-2 ring-red-100' : 'border-slate-200 focus:border-teal-500'
+                        }`}
                       />
+                      {formErrors.name && (
+                        <p className="text-[10.5px] text-red-500 font-bold mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3 shrink-0" /> {formErrors.name}
+                        </p>
+                      )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    {/* Strict 10-Digit Phone & Email */}
+                    <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
-                          <Phone className="w-3.5 h-3.5 text-teal-600" /> Mobile Number *
+                        <label className="font-bold text-slate-700 block mb-1 flex items-center justify-between">
+                          <span className="flex items-center gap-1">
+                            <Phone className="w-3.5 h-3.5 text-teal-600" /> Mobile Number *
+                          </span>
+                          {userInfo.phone.length === 10 && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />}
                         </label>
-                        <input
-                          type="tel"
-                          required
-                          value={userInfo.phone}
-                          onChange={(e) => setUserInfo({ ...userInfo, phone: e.target.value })}
-                          placeholder="e.g. 9876543210"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-teal-500"
-                        />
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-xs">+91</span>
+                          <input
+                            type="tel"
+                            maxLength={10}
+                            required
+                            value={userInfo.phone}
+                            onChange={handlePhoneChange}
+                            placeholder="9876543210"
+                            className={`w-full pl-11 pr-3 py-2.5 bg-slate-50 border rounded-xl font-bold tracking-wide focus:bg-white focus:outline-none ${
+                              formErrors.phone ? 'border-red-500 ring-2 ring-red-100' : 'border-slate-200 focus:border-teal-500'
+                            }`}
+                          />
+                        </div>
+                        <div className="text-[10px] text-slate-400 font-medium mt-0.5 flex justify-between">
+                          <span>Strict 10 digits required</span>
+                          <span className={userInfo.phone.length === 10 ? 'text-emerald-600 font-bold' : ''}>
+                            {userInfo.phone.length}/10
+                          </span>
+                        </div>
+                        {formErrors.phone && (
+                          <p className="text-[10.5px] text-red-500 font-bold mt-1 flex items-start gap-1">
+                            <AlertCircle className="w-3 h-3 shrink-0 mt-0.5" /> {formErrors.phone}
+                          </p>
+                        )}
                       </div>
+
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Email Address</label>
+                        <label className="font-bold text-slate-700 block mb-1 flex items-center justify-between">
+                          <span className="flex items-center gap-1">
+                            <Mail className="w-3.5 h-3.5 text-teal-600" /> Email Address
+                          </span>
+                        </label>
                         <input
                           type="email"
                           value={userInfo.email}
-                          onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
+                          onChange={(e) => {
+                            setUserInfo({ ...userInfo, email: e.target.value });
+                            if (formErrors.email) setFormErrors({ ...formErrors, email: '' });
+                          }}
                           placeholder="rahul@example.com"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-teal-500"
+                          className={`w-full bg-slate-50 border rounded-xl px-3 py-2.5 font-medium focus:bg-white focus:outline-none ${
+                            formErrors.email ? 'border-red-500 ring-2 ring-red-100' : 'border-slate-200 focus:border-teal-500'
+                          }`}
                         />
+                        {formErrors.email && (
+                          <p className="text-[10.5px] text-red-500 font-bold mt-1 flex items-start gap-1">
+                            <AlertCircle className="w-3 h-3 shrink-0 mt-0.5" /> {formErrors.email}
+                          </p>
+                        )}
                       </div>
                     </div>
 
+                    {/* Street Address */}
                     <div>
-                      <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-teal-600" /> Street Address / Flat / Landmark *
+                      <label className="font-bold text-slate-700 block mb-1 flex items-center justify-between">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 text-teal-600" /> Street Address / Flat / Landmark *
+                        </span>
+                        {userInfo.address.trim().length >= 5 && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />}
                       </label>
                       <textarea
                         rows={2}
                         required
                         value={userInfo.address}
-                        onChange={(e) => setUserInfo({ ...userInfo, address: e.target.value })}
-                        placeholder={`House No, Apartment name, Indiranagar, ${selectedCity}`}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-teal-500"
+                        onChange={(e) => {
+                          setUserInfo({ ...userInfo, address: e.target.value });
+                          if (formErrors.address) setFormErrors({ ...formErrors, address: '' });
+                        }}
+                        placeholder={`House/Flat No, Building Name, Indiranagar, ${selectedCity}`}
+                        className={`w-full bg-slate-50 border rounded-xl px-3 py-2.5 font-medium focus:bg-white focus:outline-none ${
+                          formErrors.address ? 'border-red-500 ring-2 ring-red-100' : 'border-slate-200 focus:border-teal-500'
+                        }`}
                       />
+                      {formErrors.address && (
+                        <p className="text-[10.5px] text-red-500 font-bold mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3 shrink-0" /> {formErrors.address}
+                        </p>
+                      )}
                     </div>
 
+                    {/* Pincode */}
                     <div>
-                      <label className="font-bold text-slate-700 block mb-1">Pincode</label>
+                      <label className="font-bold text-slate-700 block mb-1">Pincode (6 digits)</label>
                       <input
                         type="text"
+                        maxLength={6}
                         value={userInfo.pincode}
-                        onChange={(e) => setUserInfo({ ...userInfo, pincode: e.target.value })}
+                        onChange={handlePincodeChange}
                         placeholder="560001"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-teal-500"
+                        className={`w-full bg-slate-50 border rounded-xl px-3 py-2 font-bold focus:bg-white focus:outline-none ${
+                          formErrors.pincode ? 'border-red-500 ring-2 ring-red-100' : 'border-slate-200 focus:border-teal-500'
+                        }`}
                       />
+                      {formErrors.pincode && (
+                        <p className="text-[10.5px] text-red-500 font-bold mt-1">
+                          {formErrors.pincode}
+                        </p>
+                      )}
                     </div>
+
                   </div>
 
                   <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-[11px] text-emerald-800 flex items-center gap-2">
@@ -406,7 +530,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
 
             {/* Financial Summary & Action Footer */}
             {cartItems.length > 0 && (
-              <div className="p-5 bg-slate-50 border-t border-slate-200 space-y-3">
+              <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-200 space-y-3">
                 <div className="space-y-1.5 text-xs text-slate-600">
                   <div className="flex justify-between">
                     <span>Rental Subtotal</span>
