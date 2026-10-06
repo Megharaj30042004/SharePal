@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import api, { API_BASE_URL } from './config/api';
 import axios from 'axios';
 import { useCart } from './context/CartContext';
 import Navbar from './components/Navbar';
@@ -35,12 +36,13 @@ function App() {
   const [tenureModalData, setTenureModalData] = useState({ isOpen: false, product: null, initialTenure: globalTenure });
   const [confirmedOrder, setConfirmedOrder] = useState(null);
 
-  // Fetch products from backend REST API
+  // Fetch products from Render backend REST API (with local fallback)
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get('/api/products', {
+        const primaryUrl = `${API_BASE_URL}/api/products`;
+        const response = await axios.get(primaryUrl, {
           params: {
             category: activeCategory,
             sort: sortBy,
@@ -51,7 +53,17 @@ function App() {
           setProducts(response.data.data);
         }
       } catch (error) {
-        console.warn("Backend API unavailable, using initial product set:", error.message);
+        // Fallback try local endpoint if render backend is booting
+        try {
+          const fallbackRes = await axios.get('/api/products', {
+            params: { category: activeCategory, sort: sortBy, search: searchTerm }
+          });
+          if (fallbackRes.data && fallbackRes.data.data) {
+            setProducts(fallbackRes.data.data);
+          }
+        } catch (fbErr) {
+          console.warn("Backend API fetching notice:", error.message);
+        }
       } finally {
         setIsLoading(false);
       }

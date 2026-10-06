@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const CartDrawer = ({ onOrderSuccess }) => {
   const { 
@@ -76,9 +77,15 @@ const CartDrawer = ({ onOrderSuccess }) => {
         couponCode: appliedCoupon ? appliedCoupon.code : ''
       };
 
-      const response = await axios.post('/api/orders', orderPayload);
+      const primaryUrl = `${API_BASE_URL}/api/orders`;
+      let response;
+      try {
+        response = await axios.post(primaryUrl, orderPayload);
+      } catch (e) {
+        response = await axios.post('/api/orders', orderPayload);
+      }
 
-      if (response.data.success) {
+      if (response.data && response.data.success) {
         const orderData = response.data.data;
         clearCart();
         setIsCartDrawerOpen(false);
@@ -86,7 +93,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
         onOrderSuccess(orderData);
       }
     } catch (err) {
-      // Fallback local booking generation if backend server port differs
+      // Fallback local booking generation if backend server is unreachable
       const mockOrder = {
         orderId: `SP-${Math.floor(100000 + Math.random() * 900000)}`,
         user: { ...userInfo, city: selectedCity },
@@ -128,7 +135,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
             {/* Header */}
             <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-600 rounded-xl">
+                <div className="p-2 bg-teal-600 rounded-xl">
                   <ShoppingBag className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -140,7 +147,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
               </div>
               <button
                 onClick={() => setIsCartDrawerOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-full bg-slate-800 transition-colors"
+                className="p-1.5 text-slate-400 hover:text-white rounded-full bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -160,7 +167,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
                   </p>
                   <button
                     onClick={() => setIsCartDrawerOpen(false)}
-                    className="mt-5 px-5 py-2.5 bg-blue-600 text-white rounded-full text-xs font-bold shadow-md hover:bg-blue-700 transition-all"
+                    className="mt-5 px-5 py-2.5 bg-teal-600 text-white rounded-full text-xs font-bold shadow-md hover:bg-teal-700 transition-all cursor-pointer"
                   >
                     Explore Gaming Gadgets
                   </button>
@@ -181,7 +188,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
                             <h4 className="text-xs font-extrabold text-slate-900 truncate pr-6">{item.title}</h4>
                             <button
                               onClick={() => removeFromCart(idx)}
-                              className="text-slate-400 hover:text-red-500 absolute top-4 right-4"
+                              className="text-slate-400 hover:text-red-500 absolute top-4 right-4 cursor-pointer"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -192,7 +199,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
                             <select
                               value={item.tenure}
                               onChange={(e) => updateCartItemTenure(idx, e.target.value)}
-                              className="bg-white border border-slate-200 rounded-lg text-[11px] font-bold px-2 py-1 text-blue-700"
+                              className="bg-white border border-slate-200 rounded-lg text-[11px] font-bold px-2 py-1 text-teal-700 cursor-pointer"
                             >
                               <option value="1day">1 Day (Quick)</option>
                               <option value="2days">2 Days (Weekend)</option>
@@ -205,14 +212,14 @@ const CartDrawer = ({ onOrderSuccess }) => {
                             <div className="flex items-center border border-slate-200 bg-white rounded-lg px-1">
                               <button
                                 onClick={() => updateQuantity(idx, -1)}
-                                className="p-1 text-slate-500 hover:text-slate-800"
+                                className="p-1 text-slate-500 hover:text-slate-800 cursor-pointer"
                               >
                                 <Minus className="w-3 h-3" />
                               </button>
                               <span className="text-xs font-bold px-2">{item.quantity}</span>
                               <button
                                 onClick={() => updateQuantity(idx, 1)}
-                                className="p-1 text-slate-500 hover:text-slate-800"
+                                className="p-1 text-slate-500 hover:text-slate-800 cursor-pointer"
                               >
                                 <Plus className="w-3 h-3" />
                               </button>
@@ -233,9 +240,9 @@ const CartDrawer = ({ onOrderSuccess }) => {
                   </div>
 
                   {/* Coupon Code Section */}
-                  <div className="bg-gradient-to-br from-blue-50/50 to-indigo-50/50 border border-blue-100 p-4 rounded-2xl">
+                  <div className="bg-gradient-to-br from-teal-50/50 to-cyan-50/50 border border-teal-100 p-4 rounded-2xl">
                     <div className="flex items-center gap-2 text-xs font-bold text-slate-800 mb-2">
-                      <Tag className="w-4 h-4 text-blue-600" />
+                      <Tag className="w-4 h-4 text-teal-600" />
                       <span>Have a Discount Coupon?</span>
                     </div>
 
@@ -250,7 +257,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
                         </div>
                         <button
                           onClick={removeCoupon}
-                          className="text-[11px] font-bold text-red-500 hover:underline"
+                          className="text-[11px] font-bold text-red-500 hover:underline cursor-pointer"
                         >
                           Remove
                         </button>
@@ -266,7 +273,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
                         />
                         <button
                           type="submit"
-                          className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-colors"
+                          className="px-4 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
                         >
                           Apply
                         </button>
@@ -285,14 +292,14 @@ const CartDrawer = ({ onOrderSuccess }) => {
                         <button
                           type="button"
                           onClick={() => { setCouponInput('EARLYBIRD15'); applyCoupon('EARLYBIRD15'); }}
-                          className="text-[10px] font-bold bg-white text-blue-700 border border-blue-200 px-2 py-1 rounded-lg shrink-0"
+                          className="text-[10px] font-bold bg-white text-teal-700 border border-teal-200 px-2 py-1 rounded-lg shrink-0 cursor-pointer"
                         >
                           🏷️ EARLYBIRD15 (15% OFF)
                         </button>
                         <button
                           type="button"
                           onClick={() => { setCouponInput('SHAREPAL'); applyCoupon('SHAREPAL'); }}
-                          className="text-[10px] font-bold bg-white text-blue-700 border border-blue-200 px-2 py-1 rounded-lg shrink-0"
+                          className="text-[10px] font-bold bg-white text-teal-700 border border-teal-200 px-2 py-1 rounded-lg shrink-0 cursor-pointer"
                         >
                           🏷️ SHAREPAL (₹300 OFF)
                         </button>
@@ -309,7 +316,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
                     </h3>
                     <button
                       onClick={() => setIsCheckoutStep(false)}
-                      className="text-xs font-bold text-blue-600 hover:underline"
+                      className="text-xs font-bold text-teal-600 hover:underline cursor-pointer"
                     >
                       ← Back to Bag
                     </button>
@@ -324,7 +331,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
                   <div className="space-y-3 text-xs">
                     <div>
                       <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
-                        <User className="w-3.5 h-3.5 text-blue-600" /> Full Name *
+                        <User className="w-3.5 h-3.5 text-teal-600" /> Full Name *
                       </label>
                       <input
                         type="text"
@@ -332,14 +339,14 @@ const CartDrawer = ({ onOrderSuccess }) => {
                         value={userInfo.name}
                         onChange={(e) => setUserInfo({ ...userInfo, name: e.target.value })}
                         placeholder="e.g. Rahul Sharma"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-blue-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-teal-500"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
-                          <Phone className="w-3.5 h-3.5 text-blue-600" /> Mobile Number *
+                          <Phone className="w-3.5 h-3.5 text-teal-600" /> Mobile Number *
                         </label>
                         <input
                           type="tel"
@@ -347,7 +354,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
                           value={userInfo.phone}
                           onChange={(e) => setUserInfo({ ...userInfo, phone: e.target.value })}
                           placeholder="e.g. 9876543210"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-blue-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-teal-500"
                         />
                       </div>
                       <div>
@@ -357,22 +364,22 @@ const CartDrawer = ({ onOrderSuccess }) => {
                           value={userInfo.email}
                           onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
                           placeholder="rahul@example.com"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-blue-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-teal-500"
                         />
                       </div>
                     </div>
 
                     <div>
                       <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-blue-600" /> Street Address / Flat / Landmark *
+                        <MapPin className="w-3.5 h-3.5 text-teal-600" /> Street Address / Flat / Landmark *
                       </label>
                       <textarea
                         rows={2}
                         required
                         value={userInfo.address}
                         onChange={(e) => setUserInfo({ ...userInfo, address: e.target.value })}
-                        placeholder="House No, Apartment name, Indiranagar, Bangalore"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-blue-500"
+                        placeholder={`House No, Apartment name, Indiranagar, ${selectedCity}`}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-teal-500"
                       />
                     </div>
 
@@ -383,14 +390,14 @@ const CartDrawer = ({ onOrderSuccess }) => {
                         value={userInfo.pincode}
                         onChange={(e) => setUserInfo({ ...userInfo, pincode: e.target.value })}
                         placeholder="560001"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-blue-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-medium focus:bg-white focus:outline-none focus:border-teal-500"
                       />
                     </div>
                   </div>
 
                   <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-[11px] text-emerald-800 flex items-center gap-2">
                     <Truck className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Free express doorstep delivery & setup included across Bangalore!</span>
+                    <span>Free express doorstep delivery & setup included across {selectedCity}!</span>
                   </div>
                 </div>
               )}
@@ -427,14 +434,14 @@ const CartDrawer = ({ onOrderSuccess }) => {
                   </div>
                   <div className="pt-2 border-t border-slate-200 flex justify-between items-baseline text-sm font-black text-slate-900">
                     <span>Grand Total</span>
-                    <span className="text-xl text-blue-600">₹{totals.grandTotal.toLocaleString('en-IN')}</span>
+                    <span className="text-xl text-teal-600">₹{totals.grandTotal.toLocaleString('en-IN')}</span>
                   </div>
                 </div>
 
                 {!isCheckoutStep ? (
                   <button
                     onClick={() => setIsCheckoutStep(true)}
-                    className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-extrabold rounded-xl text-xs shadow-md shadow-blue-500/25 active:scale-95 transition-all"
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-teal-600 hover:bg-teal-700 text-white font-extrabold rounded-xl text-xs shadow-md shadow-teal-500/20 active:scale-95 transition-all cursor-pointer"
                   >
                     <span>Proceed to Delivery Details</span>
                     <ArrowRight className="w-4 h-4" />
@@ -443,7 +450,7 @@ const CartDrawer = ({ onOrderSuccess }) => {
                   <button
                     onClick={handleCheckout}
                     disabled={isSubmitting}
-                    className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-emerald-500/25 active:scale-95 transition-all"
+                    className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-emerald-500/25 active:scale-95 transition-all cursor-pointer"
                   >
                     {isSubmitting ? (
                       <span>Saving Booking...</span>
